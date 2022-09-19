@@ -187,6 +187,7 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 		Query:             "title ~ \"#AutomaticCascade\" AND state = \"OPEN\"",
 		States: 		   []string{"OPEN"},
 	}
+	log.Println("Before GET pullRequests...")
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
 	if err != nil {
 		return err
