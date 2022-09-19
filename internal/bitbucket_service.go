@@ -69,9 +69,9 @@ func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 	log.Println("--------- Checking AutoMergeable ---------")
 	
 	log.Println("dat.Repository.Name: ", dat.Repository.Name)
-	log.Println("request.Repository.Name: ", request.Repository.Name)
+	//log.Println("request.Repository.Name: ", request.Repository.Name)
 	log.Println("dat.Repository.Owner.Username: ", dat.Repository.Owner.Username)
-	log.Println("request.Repository.Owner.Username: ", request.Repository.Owner.Username)
+	//log.Println("request.Repository.Owner.Username: ", request.Repository.Owner.Username)
 
 	err := service.DoApproveAndMerge(dat.Repository.Owner.Username, dat.Repository.Name)
 	if err != nil {
