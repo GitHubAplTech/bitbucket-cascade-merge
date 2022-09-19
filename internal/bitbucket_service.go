@@ -207,6 +207,7 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 		return err
 	}
 	username := os.Getenv("BITBUCKET_USERNAME")
+	log.Println("username", username)
 	password := os.Getenv("BITBUCKET_PASSWORD")
 	req.SetBasicAuth(username, password)
 	response, err := service.bitbucketClient.HttpClient.Do(req)
