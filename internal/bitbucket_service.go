@@ -172,6 +172,8 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName string) error {
 
 	log.Println("In DoApproveAndMerge -> Set options...")
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
@@ -183,6 +185,9 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	if err != nil {
 		return err
 	}
+	
+	log.Println("Getting pullRequests...")
+
 	pullRequests := resp.(map[string]interface{})
 
 	for _, pr := range pullRequests["values"].([]interface{}) {
@@ -195,6 +200,9 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 			return err
 		}
 	}
+
+	log.Println("END DoApproveAndMerge...")
+
 	return nil
 }
 
