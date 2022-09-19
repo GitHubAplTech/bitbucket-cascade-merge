@@ -72,8 +72,10 @@ func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 	//log.Println("request.Repository.Name: ", request.Repository.Name)
 	log.Println("dat.Repository.Owner.Username: ", dat.Repository.Owner.Username)
 	//log.Println("request.Repository.Owner.Username: ", request.Repository.Owner.Username)
-
-	err := service.DoApproveAndMerge(dat.Repository.Owner.Username, dat.Repository.Name)
+	log.Println("os.Getenv('BITBUCKET_USERNAME'): ", os.Getenv("BITBUCKET_USERNAME"))
+	
+	//err := service.DoApproveAndMerge(dat.Repository.Owner.Username, dat.Repository.Name)
+	err := service.DoApproveAndMerge(os.Getenv("BITBUCKET_USERNAME"), dat.Repository.Name)
 	if err != nil {
 		return err
 	}
