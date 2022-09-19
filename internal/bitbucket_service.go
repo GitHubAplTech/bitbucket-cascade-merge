@@ -67,6 +67,14 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 
 	log.Println("--------- Checking AutoMergeable ---------")
+	
+	repoName := request.Repository.Name
+	repoOwner := request.Repository.Owner.Username
+	
+	log.Println("repoName: ", repoName)
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("dat.Repository.Owner.Username: ", dat.Repository.Owner.Username)
+
 	err := service.DoApproveAndMerge(dat.Repository.Owner.Username, dat.Repository.Name)
 	if err != nil {
 		return err
@@ -172,8 +180,6 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName string) error {
 
 	log.Println("In DoApproveAndMerge -> Set options...")
-	log.Println("repoOwner: ", repoOwner)
-	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
