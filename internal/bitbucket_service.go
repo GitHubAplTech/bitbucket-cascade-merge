@@ -171,7 +171,6 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 
 func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName string) error {
 
-	log.Println("Setting Options...")
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
@@ -182,7 +181,6 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	if err != nil {
 		return err
 	}
-	log.Println("Setting pullRequests...")
 	pullRequests := resp.(map[string]interface{})
 
 	for _, pr := range pullRequests["values"].([]interface{}) {
@@ -207,7 +205,6 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 		return err
 	}
 	username := os.Getenv("BITBUCKET_USERNAME")
-	log.Println("username", username)
 	password := os.Getenv("BITBUCKET_PASSWORD")
 	req.SetBasicAuth(username, password)
 	response, err := service.bitbucketClient.HttpClient.Do(req)
