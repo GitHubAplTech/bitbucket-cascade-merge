@@ -171,6 +171,8 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 
 func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName string) error {
 
+	log.Println("In DoApproveAndMerge -> Set options...")
+
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
