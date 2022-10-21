@@ -39,11 +39,12 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		log.Println("--------- Pull Request Merged ---------")
 
 		repoName := request.Repository.Name
-		log.Println("Owner (Name): ", repoOwner)
+		log.Println("repoName (Name): ", repoName)
 		repoOwner := request.Repository.Owner.Username
+		log.Println("repoOwner (Username): ", repoOwner)
 		if repoOwner == "" {
 			repoOwner := request.Repository.Owner.UUID
-			log.Println("Owner (UUID): ", repoOwner)
+			log.Println("repoOwner (UUID): ", repoOwner)
 		}
 
 		log.Println("Repository: ", repoName)
