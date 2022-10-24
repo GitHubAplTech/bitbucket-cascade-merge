@@ -204,7 +204,7 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 
 	for _, pr := range pullRequests["values"].([]interface{}) {
 		prUnwrapped := pr.(map[string]interface{})
-		log.Println("Trying to Auto Merge...")
+		log.Println("Trying to Auto Approve...")
 		log.Println("ID: ",  prUnwrapped["id"])
 		log.Println("Title: ", prUnwrapped["title"])
 		err = service.ApprovePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]))
@@ -238,6 +238,13 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 		return err
 	}
 	log.Println(string(buf))
+
+	//Try merge
+	log.Println("Trying to Auto Merge...")
+	err = service.MergePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

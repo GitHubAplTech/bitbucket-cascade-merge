@@ -29,6 +29,8 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 		log.Fatal(err)
 	}
 
+	log.Println("c.Request.Header.Get(X-Event-Key): ", c.Request.Header.Get("X-Event-Key"))
+
 	if ctrl.validate(c.Request) {
 		go func() {
 			var err error
