@@ -36,9 +36,10 @@ func main() {
 		log.Fatal("BITBUCKET_SHARED_KEY must be set. See README.md")
 	}
 
-	//bitbucketClient := bitbucket.NewBasicAuth(username, password)
+	bitbucketClient := bitbucket.NewBasicAuth(username, password)
+	/* API KEY ATTEMPT
 	ctx := context.Background()
-	bitbucketClient, err := apikeys.NewService(ctx, option.WithAPIKey(password))
+	bitbucketClient, err := apikeys.NewService(ctx, option.WithAPIKey(password)) */
 
 	bitbucketService := internal.NewBitbucketService(bitbucketClient, releaseBranchPrefix, developmentBranchName)
 	bitbucketController := internal.NewBitbucketController(bitbucketService, bitbucketSharedKey)
