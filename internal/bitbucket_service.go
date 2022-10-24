@@ -28,11 +28,16 @@ func NewBitbucketService(bitbucketClient *bitbucket.Client,
 }
 
 func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) error {
+	log.Println("--------- START OnMerge ---------")
 
 	// Only operate on release branches
 	sourceBranchName := request.PullRequest.Source.Branch.Name
 	destBranchName := request.PullRequest.Destination.Branch.Name
 	authorId := request.PullRequest.Author.UUID
+
+	log.Println("sourceBranchName", sourceBranchName)
+	log.Println("destBranchName", destBranchName)
+	log.Println("authorId", authorId)
 
 	if strings.HasPrefix(destBranchName, service.ReleaseBranchPrefix) {
 
