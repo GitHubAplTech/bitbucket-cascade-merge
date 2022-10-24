@@ -41,7 +41,7 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 
 	if strings.HasPrefix(destBranchName, service.ReleaseBranchPrefix) {
 
-		log.Println("--------- Pull Request Merged ---------")
+		log.Println("Inside blk -> Only operate on release branches")
 
 		repoName := request.Repository.Name
 		log.Println("repoName (Name): ", repoName)
@@ -62,8 +62,8 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		}
 		log.Println("Checking for internal targets: ", targets)
 		nextTarget := service.NextTarget(destBranchName, targets)
-		log.Println("Create PR -> Next Target: ", nextTarget)
-
+		
+		log.Println("Create PR -> Next Target: ", string(nextTarget))
 		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
 		if err != nil {
 			return err
