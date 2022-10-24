@@ -13,7 +13,9 @@ type BitbucketController struct {
 	BitbucketSharedKey string
 }
 
-const PrFufilled = "pullrequest:fulfilled"
+//const PrFufilled = "pullrequest:fulfilled"
+// NB!!! Revert to above again after testing!
+const PrFufilled = "repo:commit_status_updated"
 
 func NewBitbucketController(bitbucketService *BitbucketService, bitbucketSharedKey string) *BitbucketController {
 	return &BitbucketController{bitbucketService, bitbucketSharedKey}
