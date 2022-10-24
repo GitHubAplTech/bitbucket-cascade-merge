@@ -39,7 +39,8 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 	log.Println("destBranchName", destBranchName)
 	log.Println("authorId", authorId)
 
-	if strings.HasPrefix(destBranchName, service.ReleaseBranchPrefix) {
+	// NB!!! UNCOMMENT after testing!
+	//if strings.HasPrefix(destBranchName, service.ReleaseBranchPrefix) {
 
 		log.Println("Inside blk -> Only operate on release branches")
 
@@ -70,7 +71,7 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		}
 
 		log.Println("--------- End Request Merged ---------")
-	}
+	//}
 	return nil
 }
 
