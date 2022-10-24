@@ -6,6 +6,7 @@ import (
 	"github.com/ktrysmt/go-bitbucket"
 	"log"
 	"os"
+	"google.golang.org/api/apikeys/v2"
 )
 
 func main() {
@@ -35,7 +36,10 @@ func main() {
 		log.Fatal("BITBUCKET_SHARED_KEY must be set. See README.md")
 	}
 
-	bitbucketClient := bitbucket.NewBasicAuth(username, password)
+	//bitbucketClient := bitbucket.NewBasicAuth(username, password)
+	ctx := context.Background()
+	bitbucketClient, err := apikeys.NewService(ctx, option.WithAPIKey(password))
+
 	bitbucketService := internal.NewBitbucketService(bitbucketClient, releaseBranchPrefix, developmentBranchName)
 	bitbucketController := internal.NewBitbucketController(bitbucketService, bitbucketSharedKey)
 
