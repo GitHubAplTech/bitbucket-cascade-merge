@@ -153,7 +153,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	options.Query = "name ~ " + service.ReleaseBranchPrefix
 	options.Pagelen = 100
 
-	branches, err := service.bitbucketClient.Repositories.ListBranches(&options)
+	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
 
 	/* Working example for reference
 	options := bitbucket.PullRequestsOptions{
