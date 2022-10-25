@@ -58,11 +58,14 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		log.Println("Source: ", sourceBranchName)
 		log.Println("Destination: ", destBranchName)
 
-		targets, err := service.GetBranches(repoName, repoOwner)
+		//targets, err := service.GetBranches(repoName, repoOwner)
+		targets, err := service.GetBranches(repoName, request.Repository.Owner.UUID)
+		
 		if err != nil {
 			return err
 		}
 		log.Println("Checking for internal targets: ", targets)
+		
 		nextTarget := service.NextTarget(destBranchName, targets)
 		
 		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
@@ -119,7 +122,7 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 	return service.DevelopmentBranchName
 }
 
-/* ORIGINAL
+//ORIGINAL
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
@@ -133,6 +136,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
 
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	
@@ -145,8 +149,8 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	}
 	return &targets, nil
 }
-*/
 
+/*
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
@@ -195,6 +199,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	//return nil, nil
 	return &targets, nil
 }
+*/
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
 
@@ -245,23 +250,23 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
-		ID:                "",
-		CommentID:         "",
-		Owner:             repoOwner,
-		RepoSlug:          repoName,
-		Title:             "#AutomaticCascade " + src + " -> " + dest,
-		Description:       "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
+		ID:                 "",
+		CommentID:          "",
+		Owner:              repoOwner,
+		RepoSlug:           repoName,
+		Title:              "#AutomaticCascade " + src + " -> " + dest,
+		Description:        "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
 			"successful build result+approval",
-		CloseSourceBranch: false,
-		SourceBranch:      src,
-		SourceRepository:  "",
-		DestinationBranch: dest,
-		DestinationCommit: "",
-		Message:           "",
-		Reviewers:         []string{reviewer},
-		States:            nil,
-		Query:             "",
-		Sort:              "",
+		CloseSourceBranch:  false,
+		Source.Branch:      src,
+		Source.Repository:  "",
+		Destination.Branch: dest,
+		Destination.Commit: "",
+		Message:            "",
+		//Reviewers:          []string{reviewer},
+		States:             nil,
+		Query:              "",
+		Sort:               "",
 	}
 
 	log.Println("B4 CREATE pullRequests...")
