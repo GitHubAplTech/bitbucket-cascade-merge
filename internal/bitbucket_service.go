@@ -174,7 +174,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	if err := json.Unmarshal(body, &result); err != nil {   // Parse []byte to go struct pointer
 		log.Println("Can not unmarshal JSON")
 	}
-	log.Println(PrettyPrint(result))
+	log.Println("result: ", string(result))
 	
 	/* Original
 	targets := make([]string, len(branches.values))
