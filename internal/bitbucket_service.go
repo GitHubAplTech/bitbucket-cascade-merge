@@ -209,7 +209,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	//return nil, nil
 	return &targets, nil
 }
-*/
+
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
 
