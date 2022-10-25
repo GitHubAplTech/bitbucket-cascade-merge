@@ -10,8 +10,8 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"encoding/json"
 )
+//"encoding/json"
 
 type BitbucketService struct {
 	bitbucketClient *bitbucket.Client
@@ -27,6 +27,13 @@ func NewBitbucketService(bitbucketClient *bitbucket.Client,
 		releaseBranchPrefix,
 		developmentBranchName}
 }
+
+// PrettyPrint to print struct in a readable way
+func (service *BitbucketService) PrettyPrint(i interface{}) string {
+    s, _ := json.MarshalIndent(i, "", "\t")
+    return string(s)
+}
+
 
 func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) error {
 	log.Println("--------- START OnMerge ---------")
@@ -268,6 +275,8 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		Query:              "",
 		Sort:               "",
 	}
+	log.Println(service.PrettyPrint(options))
+
 
 	log.Println("B4 CREATE pullRequests...")
 
