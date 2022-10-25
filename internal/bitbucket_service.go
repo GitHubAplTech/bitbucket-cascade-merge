@@ -200,6 +200,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 		Query:             "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
 	}
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
+	log.Println("Pull Req exists? -> Resp: ", string(resp))
 	if err != nil {
 		return false, nil
 	}
