@@ -151,7 +151,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	log.Println("--------- START GetBranches ---------")
 	log.Println("repoOwner: ", repoOwner)
-	log.Println("repoName: ", repoName)
+	log.Println("repoSlug: ", repoSlug)
 
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
