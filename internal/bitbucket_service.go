@@ -258,13 +258,13 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		Description:        "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
 			"successful build result+approval",
 		CloseSourceBranch:  false,
-		Source.Branch:      src,
-		Source.Repository:  "",
-		Destination.Branch: dest,
-		Destination.Commit: "",
+		SourceBranch:       src,
+		SourceRepository:   "",
+		DestinationBranch:  dest,
+		DestinationCommit:  "",
 		Message:            "",
 		//Reviewers:          []string{reviewer},
-		States:             nil,
+		//States:             nil,
 		Query:              "",
 		Sort:               "",
 	}
