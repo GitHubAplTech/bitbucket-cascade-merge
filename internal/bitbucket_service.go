@@ -66,6 +66,8 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		nextTarget := service.NextTarget(destBranchName, targets)
 		
 		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
+
+		//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
 		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
 		if err != nil {
 			return err
@@ -148,6 +150,8 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("repoName: ", repoName)
 
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
