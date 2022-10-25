@@ -185,7 +185,9 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 	log.Println("--------- End GetBranches ---------")
 	
-	return &targets, nil
+	return &result, nil
+	//NB!!! Swap out when fixed!!!
+	//return &targets, nil
 }
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
