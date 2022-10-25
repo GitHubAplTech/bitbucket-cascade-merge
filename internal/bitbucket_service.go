@@ -173,8 +173,9 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	if err := json.Unmarshal(body, &result); err != nil {   // Parse []byte to go struct pointer
 		log.Println("Can not unmarshal JSON")
+		log.Fatal(err)
 	}
-	log.Println("result: ", string(result))
+
 	
 	/* Original
 	targets := make([]string, len(branches.values))
@@ -185,7 +186,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 	log.Println("--------- End GetBranches ---------")
 	
-	return &result, nil
+	return nil, nil
 	//NB!!! Swap out when fixed!!!
 	//return &targets, nil
 }
