@@ -184,7 +184,6 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 
 	log.Println(" B4 Targets")
-	targets := nil
 	/*
 	targets := make([]string, len(branches.values))
 	for i, branch := range branches.values {
@@ -194,7 +193,9 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 	log.Println("--------- End GetBranches ---------")
 	
-	return &targets, nil
+	//return &targets, nil
+	
+	return nil, nil
 }
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
