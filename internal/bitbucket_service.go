@@ -200,13 +200,14 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 		Query:             "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
 	}
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
-	log.Println("Pull Req exists? -> Resp: ", string(resp))
 	if err != nil {
+		log.Fatal(err)
 		return false, nil
 	}
 	pullRequests := resp.(map[string]interface{})
-	log.Println("--------- End PullRequestExists ---------")
+	log.Println("Pull Req exists? -> Resp length: ", string(len(pullRequests["values"].([]interface{}))))
 	
+	log.Println("--------- End PullRequestExists ---------")
 	return len(pullRequests["values"].([]interface{})) > 0, nil
 }
 
