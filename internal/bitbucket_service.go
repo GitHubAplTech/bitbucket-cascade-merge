@@ -176,19 +176,18 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 		log.Fatal(err)
 	}
 
-	
-	/* Original
-	targets := make([]string, len(branches.values))
-	for i, branch := range branches.values {
+    //Loop through the data
+	targets := make([]string, len(result.Values))
+	for i, branch := range result.Values {
 		log.Println("Targets -> branch.Name: ", branch.Name)
 		targets[i] = branch.Name
 	}
-	*/
+	
 	log.Println("--------- End GetBranches ---------")
 	
-	return nil, nil
-	//NB!!! Swap out when fixed!!!
-	//return &targets, nil
+	//NB!!! Temp!!!
+	//return nil, nil
+	return &targets, nil
 }
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
