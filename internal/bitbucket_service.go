@@ -147,14 +147,32 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
-
+/*
 	var options bitbucket.RepositoryBranchOptions
 	options.RepoSlug = repoSlug
 	options.Owner = repoOwner
 	options.Query = "name ~ " + service.ReleaseBranchPrefix
 	options.Pagelen = 100
 
-	branches, err := service.bitbucketClient.Repositories.Refs.ListBranches(&options)
+	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
+*/
+	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/refs/branches"
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return err
+	}
+	username := os.Getenv("BITBUCKET_USERNAME")
+	password := os.Getenv("BITBUCKET_PASSWORD")
+	req.SetBasicAuth(username, password)
+	response, err := service.bitbucketClient.HttpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	branches, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+	log.Println(string(branches))
 
 	/* Working example for reference
 	options := bitbucket.PullRequestsOptions{
