@@ -197,6 +197,8 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 	log.Println("--------- START PullRequestExists ---------")
 
 	log.Println("Set options...")
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
@@ -234,6 +236,10 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		return nil
 	}
 */
+	log.Println("Set options...")
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("repoName: ", repoName)
+
 	options := bitbucket.PullRequestsOptions{
 		ID:                "",
 		CommentID:         "",
@@ -271,6 +277,8 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	log.Println("--------- START DoApproveAndMerge ---------")
 
 	log.Println("Set options...")
+	log.Println("repoOwner: ", repoOwner)
+	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
