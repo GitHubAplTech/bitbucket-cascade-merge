@@ -129,6 +129,7 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 	return service.DevelopmentBranchName
 }
 
+/*
 //ORIGINAL
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
@@ -156,8 +157,9 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	}
 	return &targets, nil
 }
+*/
 
-/*
+//My hacked version (ListBranches no longer supported?)
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
@@ -197,6 +199,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	targets := make([]string, len(result.Values))
 	for i, branch := range result.Values {
 		log.Println("Targets -> branch.Name: ", branch.Name)
+		//TODO: Add only include if "name ~ " + service.ReleaseBranchPrefix
 		targets[i] = branch.Name
 	}
 	
