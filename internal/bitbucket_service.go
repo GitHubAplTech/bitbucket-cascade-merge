@@ -156,7 +156,10 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
 */
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
+	//Original
+    //url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
+	
+	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + os.Getenv("BITBUCKET_USERNAME") + "/" + repoSlug + "/refs/branches"
 	log.Println(string(url))
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -201,6 +204,8 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
 
+	log.Println("--------- START PullRequestExists ---------")
+
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
@@ -211,7 +216,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 		return false, nil
 	}
 	pullRequests := resp.(map[string]interface{})
-	log.Println("--------- End GetBranches ---------")
+	log.Println("--------- End PullRequestExists ---------")
 	
 	return len(pullRequests["values"].([]interface{})) > 0, nil
 }
