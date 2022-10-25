@@ -159,14 +159,15 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	//Original
     //url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
 	
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + os.Getenv("BITBUCKET_USERNAME") + "/" + repoSlug + "/refs/branches"
+	username := os.Getenv("BITBUCKET_USERNAME")
+	password := os.Getenv("BITBUCKET_PASSWORD")
+
+	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches"
 	log.Println(string(url))
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	username := os.Getenv("BITBUCKET_USERNAME")
-	password := os.Getenv("BITBUCKET_PASSWORD")
 	req.SetBasicAuth(username, password)
 	response, err := service.bitbucketClient.HttpClient.Do(req)
 	if err != nil {
