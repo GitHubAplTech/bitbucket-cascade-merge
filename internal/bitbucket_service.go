@@ -157,6 +157,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
 */
 	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
+	log.Println(string(url))
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		return nil, err
