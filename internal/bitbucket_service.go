@@ -65,7 +65,7 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		log.Println("Checking for internal targets: ", targets)
 		nextTarget := service.NextTarget(destBranchName, targets)
 		
-		log.Println("Create PR -> Next Target: ", string(nextTarget))
+		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
 		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
 		if err != nil {
 			return err
@@ -194,16 +194,22 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 
 	log.Println("--------- START PullRequestExists ---------")
 
+	log.Println("Set options...")
+
 	options := bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
 		Query:             "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
 	}
+	
+	log.Println("B4 GET pullRequests...")
+
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
 	if err != nil {
 		log.Fatal(err)
 		return false, nil
 	}
+
 	pullRequests := resp.(map[string]interface{})
 	log.Println("Pull Req exists? -> Resp length: ", string(len(pullRequests["values"].([]interface{}))))
 	
@@ -214,7 +220,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 func (service *BitbucketService) CreatePullRequest(src string, dest string, repoName string, repoOwner string, reviewer string) error {
 
 	log.Println("--------- START CreatePullRequest ---------")
-
+/*
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
 
 	if err != nil {
@@ -225,7 +231,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		log.Println("Skipping creation. Pull Request Exists: ", src, " -> ", dest)
 		return nil
 	}
-
+*/
 	options := bitbucket.PullRequestsOptions{
 		ID:                "",
 		CommentID:         "",
