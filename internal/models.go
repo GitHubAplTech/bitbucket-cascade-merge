@@ -511,7 +511,7 @@ type PullRequest struct {
 }
 
 //Branches hack (Repository.Refs.Branches)
-type Branches struct {
+type BranchesPayload struct {
 	Values []struct {
 		Name   string `json:"name"`
 		Target struct {

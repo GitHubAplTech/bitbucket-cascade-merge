@@ -10,6 +10,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"encoding/json"
 )
 
 type BitbucketService struct {
@@ -168,10 +169,10 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	}
 	log.Println("B4 Targets -> Branches resp body: ", string(body))
 
-	var result Branches
+	var result BranchesPayload
 
 	if err := json.Unmarshal(body, &result); err != nil {   // Parse []byte to go struct pointer
-		fmt.Println("Can not unmarshal JSON")
+		log.Println("Can not unmarshal JSON")
 	}
 	log.Println(PrettyPrint(result))
 	
