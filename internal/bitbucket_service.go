@@ -156,7 +156,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
 */
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/refs/branches"
+	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		return err
@@ -183,19 +183,16 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	_, err := service.bitbucketClient.Repositories.PullRequests.Merge(&options)
 	*/
 
-	log.Println("--------- End MergePullRequest ---------")
-
-	if err != nil {
-		return nil, err
-	}
-	
 	log.Println(" B4 Targets")
-
+	/*
 	targets := make([]string, len(branches.values))
 	for i, branch := range branches.values {
-	    log.Println("Targets -> branch.Name: ", branch.Name)
+		log.Println("Targets -> branch.Name: ", branch.Name)
 		targets[i] = branch.Name
 	}
+	*/
+	log.Println("--------- End GetBranches ---------")
+	
 	return &targets, nil
 }
 
