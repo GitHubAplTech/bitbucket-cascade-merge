@@ -184,6 +184,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 
 	log.Println(" B4 Targets")
+	targets := nil
 	/*
 	targets := make([]string, len(branches.values))
 	for i, branch := range branches.values {
