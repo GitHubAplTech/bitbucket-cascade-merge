@@ -252,7 +252,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		Sort:              "",
 	}
 
-	_, err = service.bitbucketClient.Repositories.PullRequests.Create(&options)
+	_, err := service.bitbucketClient.Repositories.PullRequests.Create(&options)
 
 	log.Println("--------- End CreatePullRequest ---------")
 	return err
