@@ -167,7 +167,9 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	if err != nil {
 		return nil, err
 	}
-	log.Println("B4 Targets -> Branches resp body: ", string(body))
+	
+	//Enable for debugging
+	//log.Println("B4 Targets -> Branches resp body: ", string(body))
 
 	var result BranchesPayload
 
@@ -238,7 +240,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
 		Title:             "#AutomaticCascade " + src + " -> " + dest,
-		Description:       "#AutomaticCascade " + src + " -> " + dest+", this branch will automatically be merged on " +
+		Description:       "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
 			"successful build result+approval",
 		CloseSourceBranch: false,
 		SourceBranch:      src,
@@ -252,7 +254,14 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		Sort:              "",
 	}
 
+	log.Println("B4 CREATE pullRequests...")
+
 	_, err := service.bitbucketClient.Repositories.PullRequests.Create(&options)
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
 
 	log.Println("--------- End CreatePullRequest ---------")
 	return err
