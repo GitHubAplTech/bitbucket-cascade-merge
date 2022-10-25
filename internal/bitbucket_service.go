@@ -66,7 +66,7 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 		nextTarget := service.NextTarget(destBranchName, targets)
 		
 		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
-		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
 		if err != nil {
 			return err
 		}
