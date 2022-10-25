@@ -147,18 +147,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
-/*
-	var options bitbucket.RepositoryBranchOptions
-	options.RepoSlug = repoSlug
-	options.Owner = repoOwner
-	options.Query = "name ~ " + service.ReleaseBranchPrefix
-	options.Pagelen = 100
 
-	branches, err := service.bitbucketClient.Repositories.Repository.ListBranches(&options)
-*/
-	//Original
-    //url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoSlug + "/refs/branches"
-	
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
 
@@ -173,23 +162,20 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	if err != nil {
 		return nil, err
 	}
-	branches, err := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
-	log.Println(string(branches))
+	log.Println("B4 Targets -> Branches resp body: ", string(body))
 
-	/* Working example for reference
-	options := bitbucket.PullRequestsOptions{
-		Owner:    repoOwner,
-		RepoSlug: repoName,
-		ID:       pullRequestId,
+	var result Branches
+
+	if err := json.Unmarshal(body, &result); err != nil {   // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
 	}
-	_, err := service.bitbucketClient.Repositories.PullRequests.Merge(&options)
-	*/
-
-	log.Println(" B4 Targets")
-	/*
+	log.Println(PrettyPrint(result))
+	
+	/* Original
 	targets := make([]string, len(branches.values))
 	for i, branch := range branches.values {
 		log.Println("Targets -> branch.Name: ", branch.Name)
@@ -198,9 +184,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	*/
 	log.Println("--------- End GetBranches ---------")
 	
-	//return &targets, nil
-	
-	return nil, nil
+	return &targets, nil
 }
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
