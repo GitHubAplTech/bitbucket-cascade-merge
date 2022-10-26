@@ -283,8 +283,10 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 
 	log.Println("B4 CREATE pullRequests...")
 
-	_, err := service.bitbucketClient.Repositories.PullRequests.Create(&options)
+	resp, err := service.bitbucketClient.Repositories.PullRequests.Create(&options)
 
+	log.Println(service.PrettyPrint(resp))
+	
 	if err != nil {
 		log.Fatal(err)
 		return err
