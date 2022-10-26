@@ -249,10 +249,9 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
     
 	//NB!! Put back & test cos now sending in UUID
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
-
-	log.Println("PullRequestExists -> err?: ", err)
     
 	if err != nil {
+		log.Fatal(err)
 		return err
 	}
 	
