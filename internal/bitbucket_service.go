@@ -256,7 +256,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		return err
 	}
 	
-	log.Println("PullRequestExists -> exists?: ", string(exists))
+	log.Println("PullRequestExists -> exists?: ", exists)
 	if exists {
 		log.Println("Skipping creation. Pull Request Exists: ", src, " -> ", dest)
 		return nil
