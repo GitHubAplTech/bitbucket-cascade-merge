@@ -249,6 +249,8 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
     
 	//NB!! Put back & test cos now sending in UUID
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
+
+	log.Println("PullRequestExists -> err?: ", err)
     
 	if err != nil {
 		log.Fatal(err)
@@ -295,13 +297,14 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 options := &bitbucket.PullRequestsOptions{
 			Owner:             repoOwner,
 			RepoSlug:          repoName,
-			SourceBranch:      src,
+			SourceBranch:      "release/appleufi_1.0",
 			DestinationBranch: dest,
 			Title:             "#AutomaticCascade " + src + " -> " + dest,
 			Description:       "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
-				"successful build result+approval",
+			"successful build result+approval",
 			CloseSourceBranch: false,
-	}
+		}
+		//SourceBranch:      src,
 	
 	log.Println(service.PrettyPrint(options))
 
