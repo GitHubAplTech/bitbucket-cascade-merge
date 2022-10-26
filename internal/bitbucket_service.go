@@ -243,7 +243,8 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 func (service *BitbucketService) CreatePullRequest(src string, dest string, repoName string, repoOwner string, reviewer string) error {
 
 	log.Println("--------- START CreatePullRequest ---------")
-/*
+    
+	//NB!! Put back & test cos now sending in UUID
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
 
 	if err != nil {
@@ -254,7 +255,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 		log.Println("Skipping creation. Pull Request Exists: ", src, " -> ", dest)
 		return nil
 	}
-*/
+
 	log.Println("Set options...")
 	log.Println("repoOwner: ", repoOwner)
 	log.Println("repoName: ", repoName)
