@@ -162,7 +162,7 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 
 	origTitle := request.PullRequest.Title
 	log.Println("Orig origTitle", origTitle)
-	origTitle := strings.ReplaceAll(origTitle, "#AutoCascade ", "")
+	origTitle = strings.ReplaceAll(origTitle, "#AutoCascade ", "")
 	log.Println("Replaced origTitle", origTitle)
 
 	// NB!!! UNCOMMENT if only want create on 1st merge!
