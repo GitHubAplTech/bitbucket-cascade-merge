@@ -2,20 +2,22 @@ package internal
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BitbucketController struct {
-	bitbucketService *BitbucketService
+	bitbucketService   *BitbucketService
 	BitbucketSharedKey string
 }
 
-//const PrFufilled = "pullrequest:fulfilled"
+const PrFufilled = "pullrequest:fulfilled"
+
 // NB!!! Revert to above again after testing!
-const PrFufilled = "pullrequest:approved"
+//const PrFufilled = "pullrequest:approved"
 
 func NewBitbucketController(bitbucketService *BitbucketService, bitbucketSharedKey string) *BitbucketController {
 	return &BitbucketController{bitbucketService, bitbucketSharedKey}

@@ -121,13 +121,12 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	log.Println(service.PrettyPrint(buf))
 
 	//Try merge
-	/* TODO: Uncomment to activate auto-merge!
 	log.Println("Trying to Auto Merge...")
 	err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
 	if err != nil {
 		return err
 	}
-	*/
+
 	log.Println("--------- End ApprovePullRequest ---------")
 	return nil
 }
