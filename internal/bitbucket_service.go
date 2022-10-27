@@ -353,7 +353,8 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 	options := bitbucket.PullRequestsOptions{
 		Owner:    repoOwner,
 		RepoSlug: repoName,
-		Query:    "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
+		Query:    "state = \"OPEN\" AND destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
+		States:   []string{"OPEN"},
 	}
 
 	log.Println("B4 GET pullRequests...")
