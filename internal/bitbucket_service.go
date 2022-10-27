@@ -191,15 +191,17 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 
 	nextTarget := service.NextTarget(destBranchName, targets)
 
-	log.Println("Call Create PR -> Next Target: ", string(nextTarget))
-
-	//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-	err = service.CreatePullRequest(origTitle, destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
-	if err != nil {
-		log.Println("err: ", err)
-		//return err
+	if nextTarget != "" {
+		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
+		//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+		err = service.CreatePullRequest(origTitle, destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
+		if err != nil {
+			log.Println("err: ", err)
+			//return err
+		}
+	} else {
+		log.Println("SKIP Create PR -> Next Target: ", string(nextTarget))
 	}
-
 	//}
 
 	log.Println("--------- End OnMerge ---------")
@@ -256,7 +258,7 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 	}
 
 	//Fallback to release branch (last step)
-	return service.ReleaseBranchPrefix
+	return ""
 }
 
 /*
