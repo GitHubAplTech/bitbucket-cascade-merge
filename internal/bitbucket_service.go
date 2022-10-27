@@ -257,10 +257,13 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 	}
 
 	log.Println("PullRequestExists -> exists?: ", exists)
+
+	/* TODO: Uncomment when have branch cascade order set
 	if exists {
 		log.Println("Skipping creation. Pull Request Exists: ", src, " -> ", dest)
 		return nil
 	}
+	*/
 
 	log.Println("Set options...")
 	log.Println("repoOwner: ", repoOwner)
