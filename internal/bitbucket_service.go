@@ -252,7 +252,7 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 			return target
 		}
 		//UAT to Live
-		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "release") {
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
 			log.Println("QA to UAT: ", target)
 			return target
 		}
