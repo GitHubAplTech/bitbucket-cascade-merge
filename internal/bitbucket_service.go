@@ -293,7 +293,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 
 	*/
 
-	options := bitbucket.PullRequestsOptions{
+	options := &bitbucket.PullRequestsOptions{
 		Owner:             repoOwner,
 		RepoSlug:          repoName,
 		SourceBranch:      "release/appleufi_1.0",
