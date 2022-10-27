@@ -196,7 +196,8 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 	//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
 	err = service.CreatePullRequest(origTitle, destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
 	if err != nil {
-		return err
+		log.Println("err: ", err)
+		//return err
 	}
 
 	//}
@@ -414,17 +415,11 @@ func (service *BitbucketService) CreatePullRequest(origTitle string, src string,
 
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Create(options)
 	if err != nil {
-		panic(err)
+		log.Println(service.PrettyPrint(err))
+		//panic(err)
 	}
-
-	fmt.Println(resp)
 
 	log.Println(service.PrettyPrint(resp))
-
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 
 	log.Println("--------- End CreatePullRequest ---------")
 	return err
