@@ -118,7 +118,7 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	if err != nil {
 		return err
 	}
-	log.Println(string(buf))
+	log.Println(service.PrettyPrint(buf))
 
 	//Try merge
 	/* TODO: Uncomment to activate auto-merge!
@@ -255,6 +255,7 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 		}
 	}
 
+	//Fallback to release branch (last step)
 	return service.ReleaseBranchPrefix
 }
 
@@ -359,7 +360,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return false, nil
 	}
 
