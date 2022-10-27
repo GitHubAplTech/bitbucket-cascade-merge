@@ -15,7 +15,7 @@ type BitbucketController struct {
 }
 
 const PrFufilled = "pullrequest:fulfilled"
-const PrBuildPass = "repo:commit_status_updated"
+const PrTestRetrigger = "pullrequest:comment_created"
 
 // NB!!! Revert to above again after testing!
 //const PrFufilled = "pullrequest:approved"
@@ -27,6 +27,7 @@ func NewBitbucketController(bitbucketService *BitbucketService, bitbucketSharedK
 func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 
 	var PullRequestMerged PullRequestMergedPayload
+
 	buf, err := ioutil.ReadAll(c.Request.Body)
 	err = json.Unmarshal(buf, &PullRequestMerged)
 
@@ -39,8 +40,7 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 	if ctrl.validate(c.Request) {
 		go func() {
 			var err error
-			if c.Request.Header.Get("X-Event-Key") == PrFufilled {
-				//|| request.Header.Get("X-Event-Key") == PrBuildPass {
+			if c.Request.Header.Get("X-Event-Key") == PrFufilled || c.Request.Header.Get("X-Event-Key") == PrTestRetrigger {
 				err = ctrl.bitbucketService.OnMerge(&PullRequestMerged)
 			} else {
 				err = ctrl.bitbucketService.TryMerge(&PullRequestMerged)
