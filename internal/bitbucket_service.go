@@ -66,9 +66,11 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	options := bitbucket.PullRequestsOptions{
 		Owner:    repoOwner,
 		RepoSlug: repoName,
-		Query:    "title ~ \"#AutoCascade\" AND state = \"OPEN\"",
+		Query:    "state = \"OPEN\"",
 		States:   []string{"OPEN"},
 	}
+	//Only auto approve & merge when includes #AutoCascade
+	//Query:    "title ~ \"#AutoCascade\" AND state = \"OPEN\"",
 	log.Println("B4 GET pullRequests...")
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
 	if err != nil {
