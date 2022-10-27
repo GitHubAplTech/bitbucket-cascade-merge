@@ -1,21 +1,22 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/ktrysmt/go-bitbucket"
-	"golang.org/x/mod/semver"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"sort"
 	"strings"
-	"encoding/json"
+
+	"github.com/ktrysmt/go-bitbucket"
+	"golang.org/x/mod/semver"
 )
 
 type BitbucketService struct {
-	bitbucketClient *bitbucket.Client
-	ReleaseBranchPrefix string
+	bitbucketClient       *bitbucket.Client
+	ReleaseBranchPrefix   string
 	DevelopmentBranchName string
 }
 
@@ -30,12 +31,11 @@ func NewBitbucketService(bitbucketClient *bitbucket.Client,
 
 // PrettyPrint to print struct in a readable way
 func (service *BitbucketService) PrettyPrint(i interface{}) string {
-    s, _ := json.MarshalIndent(i, "", "\t")
-    return string(s)
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
 
-
-func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) error {
+func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) error {
 	log.Println("--------- START OnMerge ---------")
 
 	// Only operate on release branches
@@ -50,54 +50,54 @@ func (service *BitbucketService) OnMerge (request *PullRequestMergedPayload) err
 	// NB!!! UNCOMMENT after testing!
 	//if strings.HasPrefix(destBranchName, service.ReleaseBranchPrefix) {
 
-		log.Println("Inside blk -> Only operate on release branches")
+	log.Println("Inside blk -> Only operate on release branches")
 
-		repoName := request.Repository.Name
-		log.Println("repoName (Name): ", repoName)
-		repoOwner := request.Repository.Owner.Username
-		log.Println("repoOwner (Username): ", repoOwner)
-		if repoOwner == "" {
-			repoOwner := request.Repository.Owner.UUID
-			log.Println("repoOwner (UUID): ", repoOwner)
-		}
+	repoName := request.Repository.Name
+	log.Println("repoName (Name): ", repoName)
+	repoOwner := request.Repository.Owner.Username
+	log.Println("repoOwner (Username): ", repoOwner)
+	if repoOwner == "" {
+		repoOwner := request.Repository.Owner.UUID
+		log.Println("repoOwner (UUID): ", repoOwner)
+	}
 
-		log.Println("Repository: ", repoName)
-		log.Println("Source: ", sourceBranchName)
-		log.Println("Destination: ", destBranchName)
+	log.Println("Repository: ", repoName)
+	log.Println("Source: ", sourceBranchName)
+	log.Println("Destination: ", destBranchName)
 
-		//targets, err := service.GetBranches(repoName, repoOwner)
-		targets, err := service.GetBranches(repoName, request.Repository.Owner.UUID)
-		
-		if err != nil {
-			return err
-		}
-		log.Println("Checking for internal targets: ", targets)
-		
-		nextTarget := service.NextTarget(destBranchName, targets)
-		
-		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
+	//targets, err := service.GetBranches(repoName, repoOwner)
+	targets, err := service.GetBranches(repoName, request.Repository.Owner.UUID)
 
-		//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-		err = service.CreatePullRequest(destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
+	}
+	log.Println("Checking for internal targets: ", targets)
+
+	nextTarget := service.NextTarget(destBranchName, targets)
+
+	log.Println("Call Create PR -> Next Target: ", string(nextTarget))
+
+	//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+	err = service.CreatePullRequest(destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
+	if err != nil {
+		return err
+	}
 
 	//}
-	
-		log.Println("--------- End OnMerge ---------")
+
+	log.Println("--------- End OnMerge ---------")
 	return nil
 }
 
 func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 
 	log.Println("--------- START TryMerge ---------")
-	
+
 	log.Println("dat.Repository.Name: ", dat.Repository.Name)
 	log.Println("dat.Repository.Owner.Username: ", dat.Repository.Owner.Username)
 	log.Println("dat.Repository.Owner.UUID: ", dat.Repository.Owner.UUID)
 	log.Println("os.Getenv('BITBUCKET_USERNAME'): ", os.Getenv("BITBUCKET_USERNAME"))
-	
+
 	//err := service.DoApproveAndMerge(dat.Repository.Owner.Username, dat.Repository.Name)
 	//err := service.DoApproveAndMerge(os.Getenv("BITBUCKET_USERNAME"), dat.Repository.Name)
 	err := service.DoApproveAndMerge(dat.Repository.Owner.UUID, dat.Repository.Name)
@@ -148,7 +148,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 		log.Fatal(err)
 		return nil, err
 	}
-	
+
 	log.Println(" B4 Targets")
 
 	targets := make([]string, len(branches.Branches))
@@ -162,7 +162,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 }
 */
 
-//My hacked version (ListBranches no longer supported?)
+// My hacked version (ListBranches no longer supported?)
 func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) (*[]string, error) {
 
 	log.Println("--------- START GetBranches ---------")
@@ -187,32 +187,31 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	//Enable for debugging
 	//log.Println("B4 Targets -> Branches resp body: ", string(body))
 
 	var result BranchesPayload
 
-	if err := json.Unmarshal(body, &result); err != nil {   // Parse []byte to go struct pointer
+	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
 		log.Println("Can not unmarshal JSON")
 		log.Fatal(err)
 	}
 
-    //Loop through the data
+	//Loop through the data
 	targets := make([]string, len(result.Values))
 	for i, branch := range result.Values {
 		log.Println("Targets -> branch.Name: ", branch.Name)
 		//TODO: Add only include if "name ~ " + service.ReleaseBranchPrefix
 		targets[i] = branch.Name
 	}
-	
+
 	log.Println("--------- End GetBranches ---------")
-	
+
 	//NB!!! Temp!!!
 	//return nil, nil
 	return &targets, nil
 }
-
 
 func (service *BitbucketService) PullRequestExists(repoName string, repoOwner string, source string, destination string) (bool, error) {
 
@@ -223,11 +222,11 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
-		Owner:             repoOwner,
-		RepoSlug:          repoName,
-		Query:             "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
+		Owner:    repoOwner,
+		RepoSlug: repoName,
+		Query:    "destination.branch.name = \"" + destination + "\" AND source.branch.name=\"" + source + "\"",
 	}
-	
+
 	log.Println("B4 GET pullRequests...")
 
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
@@ -238,7 +237,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 
 	pullRequests := resp.(map[string]interface{})
 	log.Println("Pull Req exists? -> Resp length: ", string(len(pullRequests["values"].([]interface{}))))
-	
+
 	log.Println("--------- End PullRequestExists ---------")
 	return len(pullRequests["values"].([]interface{})) > 0, nil
 }
@@ -246,17 +245,17 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 func (service *BitbucketService) CreatePullRequest(src string, dest string, repoName string, repoOwner string, reviewer string) error {
 
 	log.Println("--------- START CreatePullRequest ---------")
-    
+
 	//NB!! Put back & test cos now sending in UUID
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
 
 	log.Println("PullRequestExists -> err?: ", err)
-    
+
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
-	
+
 	log.Println("PullRequestExists -> exists?: ", exists)
 	if exists {
 		log.Println("Skipping creation. Pull Request Exists: ", src, " -> ", dest)
@@ -267,7 +266,7 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 	log.Println("repoOwner: ", repoOwner)
 	log.Println("repoName: ", repoName)
 
-/* ORIGINAL
+	/* ORIGINAL
 	options := bitbucket.PullRequestsOptions{
 		ID:                 "",
 		CommentID:          "",
@@ -291,34 +290,34 @@ func (service *BitbucketService) CreatePullRequest(src string, dest string, repo
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Create(&options)
 
 	log.Println(service.PrettyPrint(resp))
-	
-*/
 
-options := &bitbucket.PullRequestsOptions{
-			Owner:             repoOwner,
-			RepoSlug:          repoName,
-			SourceBranch:      "release/appleufi_1.0",
-			DestinationBranch: dest,
-			Title:             "#AutomaticCascade " + src + " -> " + dest,
-			Description:       "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
+	*/
+
+	options := bitbucket.PullRequestsOptions{
+		Owner:             repoOwner,
+		RepoSlug:          repoName,
+		SourceBranch:      "release/appleufi_1.0",
+		DestinationBranch: "feature/appleufi_1.0",
+		Title:             "#AutomaticCascade " + src + " -> " + dest,
+		Description: "#AutomaticCascade " + src + " -> " + dest + ", this branch will automatically be merged on " +
 			"successful build result+approval",
-			CloseSourceBranch: false,
-		}
-		//SourceBranch:      src,
-	
+		CloseSourceBranch: false,
+	}
+	//SourceBranch:      src,
+	//DestinationBranch: dest,
+
 	log.Println(service.PrettyPrint(options))
 
 	log.Println("B4 CREATE pullRequests...")
 
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Create(options)
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 
 	fmt.Println(resp)
 
 	log.Println(service.PrettyPrint(resp))
-
 
 	if err != nil {
 		log.Fatal(err)
@@ -337,24 +336,24 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	log.Println("repoName: ", repoName)
 
 	options := bitbucket.PullRequestsOptions{
-		Owner:             repoOwner,
-		RepoSlug:          repoName,
-		Query:             "title ~ \"#AutomaticCascade\" AND state = \"OPEN\"",
-		States: 		   []string{"OPEN"},
+		Owner:    repoOwner,
+		RepoSlug: repoName,
+		Query:    "title ~ \"#AutomaticCascade\" AND state = \"OPEN\"",
+		States:   []string{"OPEN"},
 	}
 	log.Println("B4 GET pullRequests...")
 	resp, err := service.bitbucketClient.Repositories.PullRequests.Gets(&options)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("B4 looping through pullRequests...")
 
 	pullRequests := resp.(map[string]interface{})
 
 	for _, pr := range pullRequests["values"].([]interface{}) {
 		prUnwrapped := pr.(map[string]interface{})
-		log.Println("ID: ",  prUnwrapped["id"])
+		log.Println("ID: ", prUnwrapped["id"])
 		log.Println("Title: ", prUnwrapped["title"])
 		log.Println("Trying to Auto Approve...")
 		err = service.ApprovePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]))
