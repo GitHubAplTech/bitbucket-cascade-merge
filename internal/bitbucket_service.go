@@ -319,32 +319,36 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 
 		//Dev to QA
 		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
-			log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
-			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
-			if err != nil {
-				log.Println("err: ", err)
-				//return err
+			//check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
+				err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+				if err != nil {
+					log.Println("err: ", err)
+					//return err
+				}
 			}
 		}
 		//QA to UAT
-		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") {
-			log.Println("QA to UAT: Call Create PR (All-sites) -> Next Target: ", target)
-			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
-			if err != nil {
-				log.Println("err: ", err)
-				//return err
+		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") { //check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("QA to UAT: Call Create PR (All-sites) -> Next Target: ", target)
+				err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+				if err != nil {
+					log.Println("err: ", err)
+					//return err
+				}
 			}
 		}
 		//UAT to Release
-		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
-			log.Println("UAT to Release: Call Create PR (All-sites) -> Next Target: ", target)
-			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
-			if err != nil {
-				log.Println("err: ", err)
-				//return err
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") { //check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("UAT to Release: Call Create PR (All-sites) -> Next Target: ", target)
+				err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+				if err != nil {
+					log.Println("err: ", err)
+					//return err
+				}
 			}
 		}
 	}
