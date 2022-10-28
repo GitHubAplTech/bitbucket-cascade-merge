@@ -277,8 +277,16 @@ func (service *BitbucketService) SiteSpecificNextTarget(oldDest string, cascadeT
 		log.Println("oldDest: ", target)
 		log.Println("target: ", target)
 
+		//Main to Dev
+		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "dev") {
+			//check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("Dev to QA: ", target)
+				return target
+			}
+		}
 		//Dev to QA
-		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
+		if strings.HasPrefix(oldDest, "dev") && strings.HasPrefix(target, "qa") {
 			//check same site name
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
 				log.Println("Dev to QA: ", target)
@@ -322,8 +330,17 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 		log.Println("oldDest Site: ", service.GetStringInBetween(oldDest, "/", "_"))
 		log.Println("target Site: ", service.GetStringInBetween(target, "/", "_"))
 
+		//Main to Dev
+		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "dev") {
+			log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
+			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+			if err != nil {
+				log.Println("err: ", err)
+				//return err
+			}
+		}
 		//Dev to QA
-		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
+		if strings.HasPrefix(oldDest, "dev") && strings.HasPrefix(target, "qa") {
 			log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
 			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
 			if err != nil {
