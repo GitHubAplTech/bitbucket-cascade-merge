@@ -37,18 +37,21 @@ func (service *BitbucketService) PrettyPrint(i interface{}) string {
 }
 
 // GetStringInBetween Returns empty string if no start string found
-func (service *BitbucketService) GetStringInBetween(str string, start string, end string) (result string) {
-	s := strings.Index(str, start)
-	if s == -1 {
-		return
+func (service *BitbucketService) GetStringInBetween(value string, a string, b string) string {
+	// Get substring between two strings.
+	posFirst := strings.Index(value, a)
+	if posFirst == -1 {
+		return ""
 	}
-	s += len(start)
-	e := strings.Index(str[s:], end)
-	if e == -1 {
-		return
+	posLast := strings.Index(value, b)
+	if posLast == -1 {
+		return ""
 	}
-	e += s + e - 1
-	return str[s:e]
+	posFirstAdjusted := posFirst + len(a)
+	if posFirstAdjusted >= posLast {
+		return ""
+	}
+	return value[posFirstAdjusted:posLast]
 }
 
 /*** EXISTING PR -> AUTO APPROVE & MERGE ***/
