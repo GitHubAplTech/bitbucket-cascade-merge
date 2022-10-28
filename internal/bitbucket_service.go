@@ -314,8 +314,10 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 	//Loop to find next target based on destination of merged PR
 	for i, target := range targets {
 		log.Println("Target Loop: ", i)
-		log.Println("oldDest: ", target)
+		log.Println("oldDest: ", oldDest)
 		log.Println("target: ", target)
+		log.Println("oldDest Site: ", service.GetStringInBetween(oldDest, "/", "_"))
+		log.Println("target Site: ", service.GetStringInBetween(target, "/", "_"))
 
 		//Dev to QA
 		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
@@ -342,6 +344,7 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 		}
 		//UAT to Release
 		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, service.ReleaseBranchPrefix) { //check same site name
+			log.Println("UAT to Release: Checking site match")
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
 				log.Println("UAT to Release: Call Create PR (All-sites) -> Next Target: ", target)
 				err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
