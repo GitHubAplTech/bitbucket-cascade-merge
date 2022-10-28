@@ -14,9 +14,10 @@ type BitbucketController struct {
 	BitbucketSharedKey string
 }
 
-// const PrFufilled = "pullrequest:fulfilled"
+const PrFufilled = "pullrequest:fulfilled"
+
 // NB!!! Revert to above again after testing!
-const PrFufilled = "pullrequest:approved"
+// const PrFufilled = "pullrequest:approved"
 
 const PrTestRetrigger = "pullrequest:comment_created"
 

@@ -107,7 +107,7 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 
 		log.Println("ID: ", prUnwrapped["id"])
 		log.Println("Title: ", prUnwrapped["title"])
-		log.Println("DEBUG - Destination: ", prUnwrapped["destination.branch.name"])
+		log.Println("DEBUG - Destination: ", prUnwrapped["destination"].(map[string]interface{})["branch"].(map[string]interface{})["name"])
 		log.Println("Trying to Auto Approve...")
 
 		// IF ABOVE WORKS SEND IN , fmt.Sprintf("%v", prUnwrapped["destination.branch.name"])
