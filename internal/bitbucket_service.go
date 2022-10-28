@@ -144,8 +144,8 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	}
 	log.Println(service.PrettyPrint(buf))
 
-	//Try merge (if not UAT)
-	if !strings.HasPrefix(destBranch, "uat") {
+	//Try merge (if not UAT or Release)
+	if !strings.HasPrefix(destBranch, "uat") && !strings.HasPrefix(destBranch, "uat") {
 		log.Println("Try to Auto Merge -> ", destBranch)
 		err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
 		if err != nil {
@@ -291,7 +291,7 @@ func (service *BitbucketService) SiteSpecificNextTarget(oldDest string, cascadeT
 			}
 		}
 		//UAT to Live
-		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, service.ReleaseBranchPrefix) {
 			//check same site name
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
 				log.Println("QA to UAT: ", target)
@@ -341,7 +341,7 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 			}
 		}
 		//UAT to Release
-		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") { //check same site name
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, service.ReleaseBranchPrefix) { //check same site name
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
 				log.Println("UAT to Release: Call Create PR (All-sites) -> Next Target: ", target)
 				err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
@@ -452,7 +452,6 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	targets := make([]string, len(result.Values))
 	for i, branch := range result.Values {
 		log.Println("Targets -> branch.Name: ", branch.Name)
-		//TODO: ?? Add only include if "name ~ " + service.ReleaseBranchPrefix
 		targets[i] = branch.Name
 	}
 
