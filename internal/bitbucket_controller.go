@@ -41,8 +41,8 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 	if ctrl.validate(c.Request) {
 		go func() {
 			var err error
-			// || c.Request.Header.Get("X-Event-Key") == PrTestRetrigger
-			if c.Request.Header.Get("X-Event-Key") == PrFufilled {
+			//
+			if c.Request.Header.Get("X-Event-Key") == PrFufilled || c.Request.Header.Get("X-Event-Key") == PrTestRetrigger {
 				err = ctrl.bitbucketService.OnMerge(&PullRequestMerged)
 			} else {
 				err = ctrl.bitbucketService.TryMerge(&PullRequestMerged)
