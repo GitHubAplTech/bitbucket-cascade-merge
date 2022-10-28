@@ -140,10 +140,16 @@ func (service *BitbucketService) MergePullRequest(repoOwner string, repoName str
 		RepoSlug: repoName,
 		ID:       pullRequestId,
 	}
-	_, err := service.bitbucketClient.Repositories.PullRequests.Merge(&options)
-	log.Println("--------- End MergePullRequest ---------")
+	resp, err := service.bitbucketClient.Repositories.PullRequests.Merge(&options)
+	log.Println(service.PrettyPrint(resp))
+	if err != nil {
+		log.Println("error: ", err)
+		/* Don't return error (causes crash)
+		return err */
+	}
 
-	return err
+	log.Println("--------- End MergePullRequest ---------")
+	return nil
 }
 
 /*** AFTER MERGE -> CREATE NEXT BRANCH PR ***/
