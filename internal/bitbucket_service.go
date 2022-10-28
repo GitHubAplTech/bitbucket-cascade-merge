@@ -107,13 +107,10 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 
 		log.Println("ID: ", prUnwrapped["id"])
 		log.Println("Title: ", prUnwrapped["title"])
-		log.Println("DEBUG - Destination: ", prUnwrapped["destination"].(map[string]interface{})["branch"].(map[string]interface{})["name"])
+		log.Println("Destination: ", prUnwrapped["destination"].(map[string]interface{})["branch"].(map[string]interface{})["name"])
 		log.Println("Trying to Auto Approve...")
 
-		// IF ABOVE WORKS SEND IN , fmt.Sprintf("%v", prUnwrapped["destination.branch.name"])
-		// Then check if merging to UAT & Don't do merge step
-
-		err = service.ApprovePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]))
+		err = service.ApprovePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]), fmt.Sprintf("%v", prUnwrapped["destination"].(map[string]interface{})["branch"].(map[string]interface{})["name"]))
 		if err != nil {
 			return err
 		}
@@ -126,7 +123,7 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 
 // HACK: There isn't an API method in the Bitbucket API Library to do pull request
 // approval. Hacking together one here.
-func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName string, pullRequestId string) error {
+func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName string, pullRequestId string, destBranch string) error {
 	log.Println("--------- START ApprovePullRequest ---------")
 
 	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
@@ -147,14 +144,17 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	}
 	log.Println(service.PrettyPrint(buf))
 
-	/* NB!!! REMOVE AFTER TESTING
-	//Try merge
-	log.Println("Trying to Auto Merge...")
-	err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
-	if err != nil {
-		return err
+	//Try merge (if not UAT)
+	if !strings.HasPrefix(destBranch, "uat") {
+		log.Println("Try to Auto Merge -> ", destBranch)
+		err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Println("SKIP Auto Merge -> ", destBranch)
 	}
-	*/
+
 	log.Println("--------- End ApprovePullRequest ---------")
 	return nil
 }
