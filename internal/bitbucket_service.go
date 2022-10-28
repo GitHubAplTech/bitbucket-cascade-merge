@@ -340,7 +340,9 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 			}
 		}
 		//Dev to QA
-		if strings.HasPrefix(oldDest, "dev") && strings.HasPrefix(target, "qa") {
+		if strings.HasPrefix(oldDest, "dev") && strings.HasPrefix(target, "qa") &&
+			//check same site name
+			service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
 			log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
 			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
 			if err != nil {
