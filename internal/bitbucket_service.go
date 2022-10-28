@@ -27,13 +27,32 @@ func NewBitbucketService(bitbucketClient *bitbucket.Client,
 		developmentBranchName}
 }
 
+/*** Utility Functions ***/
+/* ===================== */
+
 // PrettyPrint to print struct in a readable way
 func (service *BitbucketService) PrettyPrint(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
 }
 
+// GetStringInBetween Returns empty string if no start string found
+func (service *BitbucketService) GetStringInBetween(str string, start string, end string) (result string) {
+	s := strings.Index(str, start)
+	if s == -1 {
+		return
+	}
+	s += len(start)
+	e := strings.Index(str[s:], end)
+	if e == -1 {
+		return
+	}
+	e += s + e - 1
+	return str[s:e]
+}
+
 /*** EXISTING PR -> AUTO APPROVE & MERGE ***/
+/* ======================================= */
 
 func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 
@@ -83,10 +102,17 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 	pullRequests := resp.(map[string]interface{})
 
 	for _, pr := range pullRequests["values"].([]interface{}) {
+
 		prUnwrapped := pr.(map[string]interface{})
+
 		log.Println("ID: ", prUnwrapped["id"])
 		log.Println("Title: ", prUnwrapped["title"])
+		log.Println("DEBUG - Destination: ", prUnwrapped["destination.branch.name"])
 		log.Println("Trying to Auto Approve...")
+
+		// IF ABOVE WORKS SEND IN , fmt.Sprintf("%v", prUnwrapped["destination.branch.name"])
+		// Then check if merging to UAT & Don't do merge step
+
 		err = service.ApprovePullRequest(repoOwner, repoName, fmt.Sprintf("%v", prUnwrapped["id"]))
 		if err != nil {
 			return err
@@ -121,13 +147,14 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	}
 	log.Println(service.PrettyPrint(buf))
 
+	/* NB!!! REMOVE AFTER TESTING
 	//Try merge
 	log.Println("Trying to Auto Merge...")
 	err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
 	if err != nil {
 		return err
 	}
-
+	*/
 	log.Println("--------- End ApprovePullRequest ---------")
 	return nil
 }
@@ -153,6 +180,7 @@ func (service *BitbucketService) MergePullRequest(repoOwner string, repoName str
 }
 
 /*** AFTER MERGE -> CREATE NEXT BRANCH PR ***/
+/* ======================================== */
 
 func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) error {
 	log.Println("--------- START OnMerge ---------")
@@ -168,6 +196,8 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 
 	origTitle := request.PullRequest.Title
 	log.Println("Orig origTitle", origTitle)
+	siteSpecific := (destBranchName != service.DevelopmentBranchName && !strings.HasPrefix(origTitle, "#AutoCascade "))
+
 	origTitle = strings.ReplaceAll(origTitle, "#AutoCascade ", "")
 	log.Println("Replaced origTitle", origTitle)
 
@@ -187,6 +217,7 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 	log.Println("Repository: ", repoName)
 	log.Println("Source: ", sourceBranchName)
 	log.Println("Destination: ", destBranchName)
+	log.Println("siteSpecific: ", siteSpecific)
 
 	//targets, err := service.GetBranches(repoName, repoOwner)
 	targets, err := service.GetBranches(repoName, request.Repository.Owner.UUID)
@@ -196,22 +227,130 @@ func (service *BitbucketService) OnMerge(request *PullRequestMergedPayload) erro
 	}
 	log.Println("Checking for internal targets: ", targets)
 
-	nextTarget := service.NextTarget(destBranchName, targets)
+	//Cater for starting in dev branch of particular site
+	if siteSpecific {
+		log.Println("Site-specific commit!")
 
-	if nextTarget != "" {
-		log.Println("Call Create PR -> Next Target: ", string(nextTarget))
-		//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
-		err = service.CreatePullRequest(origTitle, destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
+		nextTarget := service.SiteSpecificNextTarget(destBranchName, targets)
+
+		if nextTarget != "" {
+			log.Println("Call Create PR (Site-specific) -> Next Target: ", string(nextTarget))
+			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+			err = service.CreatePullRequest(origTitle, destBranchName, nextTarget, repoName, request.Repository.Owner.UUID, authorId)
+			if err != nil {
+				log.Println("err: ", err)
+				//return err
+			}
+		} else {
+			log.Println("SKIP Create PR (Site-specific) -> Next Target: ", string(nextTarget))
+		}
+
+		//Propagate to all site dev branches
+	} else {
+		log.Println("All-sites commit!")
+
+		err := service.AllSitesNextTarget(destBranchName, targets, origTitle, repoName, request.Repository.Owner.UUID, authorId)
+
 		if err != nil {
 			log.Println("err: ", err)
 			//return err
 		}
-	} else {
-		log.Println("SKIP Create PR -> Next Target: ", string(nextTarget))
 	}
 	//}
 
 	log.Println("--------- End OnMerge ---------")
+	return nil
+}
+
+// Site-Specific merge path
+func (service *BitbucketService) SiteSpecificNextTarget(oldDest string, cascadeTargets *[]string) string {
+	targets := *cascadeTargets
+
+	log.Println("--------- START SiteSpecificNextTarget ---------")
+
+	//Loop to find next target based on destination of merged PR
+	for i, target := range targets {
+		log.Println("Target Loop: ", i)
+		log.Println("oldDest: ", target)
+		log.Println("target: ", target)
+
+		//Dev to QA
+		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
+			//check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("Dev to QA: ", target)
+				return target
+			}
+		}
+		//QA to UAT
+		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") {
+			//check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("QA to UAT: ", target)
+				return target
+			}
+		}
+		//UAT to Live
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
+			//check same site name
+			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
+				log.Println("QA to UAT: ", target)
+				return target
+			}
+		}
+	}
+
+	log.Println("--------- End SiteSpecificNextTarget ---------")
+	//Fallback on no desitination branch
+	return ""
+}
+
+// Mine
+func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTargets *[]string, origTitle string, repoName string, repoOwner string, authorId string) error {
+	targets := *cascadeTargets
+
+	log.Println("--------- START AllSitesNextTarget ---------")
+
+	//Loop to find next target based on destination of merged PR
+	for i, target := range targets {
+		log.Println("Target Loop: ", i)
+		log.Println("oldDest: ", target)
+		log.Println("target: ", target)
+
+		//Dev to QA
+		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
+			log.Println("Dev to QA: Call Create PR (All-sites) -> Next Target: ", target)
+			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+			if err != nil {
+				log.Println("err: ", err)
+				//return err
+			}
+		}
+		//QA to UAT
+		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") {
+			log.Println("QA to UAT: Call Create PR (All-sites) -> Next Target: ", target)
+			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+			if err != nil {
+				log.Println("err: ", err)
+				//return err
+			}
+		}
+		//UAT to Release
+		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
+			log.Println("UAT to Release: Call Create PR (All-sites) -> Next Target: ", target)
+			//err = service.CreatePullRequest(destBranchName, nextTarget, repoName, repoOwner, authorId)
+			err := service.CreatePullRequest(origTitle, oldDest, target, repoName, repoOwner, authorId)
+			if err != nil {
+				log.Println("err: ", err)
+				//return err
+			}
+		}
+	}
+
+	log.Println("--------- End AllSitesNextTarget ---------")
+	//Fallback on no desitination branch
 	return nil
 }
 
@@ -236,37 +375,6 @@ func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]st
 	return service.DevelopmentBranchName
 }
 */
-
-// Mine
-func (service *BitbucketService) NextTarget(oldDest string, cascadeTargets *[]string) string {
-	targets := *cascadeTargets
-
-	//Loop to find next target based on destination of merged PR
-	for i, target := range targets {
-		log.Println("Target Loop: ", i)
-		log.Println("oldDest: ", target)
-		log.Println("target: ", target)
-
-		//Dev to QA
-		if oldDest == service.DevelopmentBranchName && strings.HasPrefix(target, "qa") {
-			log.Println("Dev to QA: ", target)
-			return target
-		}
-		//QA to UAT
-		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") {
-			log.Println("QA to UAT: ", target)
-			return target
-		}
-		//UAT to Live
-		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, "release") {
-			log.Println("QA to UAT: ", target)
-			return target
-		}
-	}
-
-	//Fallback to release branch (last step)
-	return ""
-}
 
 /*
 //ORIGINAL
