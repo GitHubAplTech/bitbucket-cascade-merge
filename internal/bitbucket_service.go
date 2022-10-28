@@ -148,7 +148,7 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 	log.Println(service.PrettyPrint(buf))
 
 	//Try merge (if not UAT or Release)
-	if !strings.HasPrefix(destBranch, "uat") && !strings.HasPrefix(destBranch, "uat") {
+	if !strings.HasPrefix(destBranch, "uat") && !strings.HasPrefix(destBranch, service.ReleaseBranchPrefix) {
 		log.Println("Try to Auto Merge -> ", destBranch)
 		err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
 		if err != nil {
