@@ -443,7 +443,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
 
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=20"
+	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=100"
 	log.Println(string(url))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
