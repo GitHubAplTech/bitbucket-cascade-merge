@@ -312,6 +312,12 @@ type PullRequestMergedPayload struct {
 	Actor       Owner       `json:"actor"`
 	PullRequest PullRequest `json:"pullrequest"`
 	Repository  Repository  `json:"repository"`
+	Comment     struct {
+		ID      int64 `json:"id"`
+		Content struct {
+			Raw string `json:"raw"`
+		} `json:"content"`
+	} `json:"comment"`
 }
 
 // PullRequestDeclinedPayload is the Bitbucket pullrequest:rejected payload
@@ -510,7 +516,7 @@ type PullRequest struct {
 	} `json:"links"`
 }
 
-//Branches hack (Repository.Refs.Branches)
+// Branches hack (Repository.Refs.Branches)
 type BranchesPayload struct {
 	Values []struct {
 		Name   string `json:"name"`

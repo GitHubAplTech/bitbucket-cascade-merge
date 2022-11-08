@@ -19,7 +19,7 @@ const PrFufilled = "pullrequest:fulfilled"
 // NB!!! Revert to above again after testing!
 // const PrFufilled = "pullrequest:approved"
 
-const PrTestRetrigger = "pullrequest:comment_created"
+const PrCommentTrigger = "pullrequest:comment_created"
 
 func NewBitbucketController(bitbucketService *BitbucketService, bitbucketSharedKey string) *BitbucketController {
 	return &BitbucketController{bitbucketService, bitbucketSharedKey}
@@ -27,10 +27,10 @@ func NewBitbucketController(bitbucketService *BitbucketService, bitbucketSharedK
 
 func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 
-	var PullRequestMerged PullRequestMergedPayload
+	var PullRequestPayload PullRequestMergedPayload
 
 	buf, err := ioutil.ReadAll(c.Request.Body)
-	err = json.Unmarshal(buf, &PullRequestMerged)
+	err = json.Unmarshal(buf, &PullRequestPayload)
 
 	if err != nil {
 		log.Fatal(err)
@@ -41,11 +41,25 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 	if ctrl.validate(c.Request) {
 		go func() {
 			var err error
-			//
-			if c.Request.Header.Get("X-Event-Key") == PrFufilled || c.Request.Header.Get("X-Event-Key") == PrTestRetrigger {
-				err = ctrl.bitbucketService.OnMerge(&PullRequestMerged)
+			var PrForceRetrigger bool
+
+			// Detect a force-retrigger
+			if c.Request.Header.Get("X-Event-Key") == PrCommentTrigger {
+				log.Println("In Detect a force-retrigger. Comment=", PullRequestPayload.Comment.Content.Raw)
+
+				// Only counts if comment = "#AutoCascade"
+				if PullRequestPayload.Comment.Content.Raw == "#AutoCascade" {
+					log.Println("In Set PrForceRetrigger = true")
+					PrForceRetrigger = true
+				}
+
+			}
+
+			// Fork for logic processing
+			if c.Request.Header.Get("X-Event-Key") == PrFufilled || PrForceRetrigger {
+				err = ctrl.bitbucketService.OnMerge(&PullRequestPayload)
 			} else {
-				err = ctrl.bitbucketService.TryMerge(&PullRequestMerged)
+				err = ctrl.bitbucketService.TryMerge(&PullRequestPayload)
 			}
 			if err != nil {
 				log.Fatal(err)
