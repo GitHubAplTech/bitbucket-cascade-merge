@@ -302,7 +302,7 @@ func (service *BitbucketService) SiteSpecificNextTarget(oldDest string, cascadeT
 				return target
 			}
 		}
-		//UAT to Live
+		//UAT to Release
 		if strings.HasPrefix(oldDest, "uat") && strings.HasPrefix(target, service.ReleaseBranchPrefix) {
 			//check same site name
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
@@ -473,8 +473,13 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	//Loop through the data
 	targets := make([]string, len(result.Values))
 	for i, branch := range result.Values {
-		log.Println("Targets -> branch.Name: ", branch.Name)
-		targets[i] = branch.Name
+		// Leave Production branches alone!
+		if strings.HasPrefix(branch.Name, "prod/") {
+			log.Println("PRODUCTION SKIPPED -> branch.Name: ", branch.Name)
+		} else {
+			log.Println("Targets -> branch.Name: ", branch.Name)
+			targets[i] = branch.Name
+		}
 	}
 
 	log.Println("--------- End GetBranches ---------")
