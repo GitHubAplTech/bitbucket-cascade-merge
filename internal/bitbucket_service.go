@@ -72,7 +72,6 @@ func (service *BitbucketService) TryMerge(dat *PullRequestMergedPayload) error {
 	if err != nil {
 		return err
 	}
-	//Try Merge (called from inside ApprovePullRequest)
 
 	log.Println("--------- End TryMerge ---------")
 	return nil
