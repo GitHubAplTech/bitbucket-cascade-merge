@@ -130,28 +130,33 @@ func (service *BitbucketService) DoApproveAndMerge(repoOwner string, repoName st
 func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName string, pullRequestId string, destBranch string) error {
 	log.Println("--------- START ApprovePullRequest ---------")
 
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		return err
+	//Try approve (if not UAT)
+	if !strings.HasPrefix(destBranch, "uat") {
+		url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
+		req, err := http.NewRequest("POST", url, nil)
+		if err != nil {
+			return err
+		}
+		username := os.Getenv("BITBUCKET_USERNAME")
+		password := os.Getenv("BITBUCKET_PASSWORD")
+		req.SetBasicAuth(username, password)
+		response, err := service.bitbucketClient.HttpClient.Do(req)
+		if err != nil {
+			return err
+		}
+		buf, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		log.Println(service.PrettyPrint(buf))
+	} else {
+		log.Println("SKIP Auto Approve -> ", destBranch)
 	}
-	username := os.Getenv("BITBUCKET_USERNAME")
-	password := os.Getenv("BITBUCKET_PASSWORD")
-	req.SetBasicAuth(username, password)
-	response, err := service.bitbucketClient.HttpClient.Do(req)
-	if err != nil {
-		return err
-	}
-	buf, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-	log.Println(service.PrettyPrint(buf))
 
 	//Try merge (if not UAT or Release)
 	if !strings.HasPrefix(destBranch, "uat") && !strings.HasPrefix(destBranch, service.ReleaseBranchPrefix) {
 		log.Println("Try to Auto Merge -> ", destBranch)
-		err = service.MergePullRequest(repoOwner, repoName, pullRequestId)
+		err := service.MergePullRequest(repoOwner, repoName, pullRequestId)
 		if err != nil {
 			return err
 		}
@@ -295,6 +300,7 @@ func (service *BitbucketService) SiteSpecificNextTarget(oldDest string, cascadeT
 			}
 		}
 		//QA to UAT
+		//Commented to allow Cherry-picking for UAT testing
 		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") {
 			//check same site name
 			if service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
@@ -352,6 +358,7 @@ func (service *BitbucketService) AllSitesNextTarget(oldDest string, cascadeTarge
 			}
 		}
 		//QA to UAT
+		//Commented to allow Cherry-picking for UAT testing
 		if strings.HasPrefix(oldDest, "qa") && strings.HasPrefix(target, "uat") &&
 			//check same site name
 			service.GetStringInBetween(oldDest, "/", "_") == service.GetStringInBetween(target, "/", "_") {
@@ -484,8 +491,6 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	log.Println("--------- End GetBranches ---------")
 
-	//NB!!! Temp!!!
-	//return nil, nil
 	return &targets, nil
 }
 
@@ -523,7 +528,7 @@ func (service *BitbucketService) CreatePullRequest(origTitle string, src string,
 
 	log.Println("--------- START CreatePullRequest ---------")
 
-	//NB!! Put back & test cos now sending in UUID
+	//TODO: Put back & test cos now sending in UUID?
 	exists, err := service.PullRequestExists(repoName, repoOwner, src, dest)
 
 	log.Println("PullRequestExists -> err?: ", err)
