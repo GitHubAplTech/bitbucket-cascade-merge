@@ -517,7 +517,7 @@ func (service *BitbucketService) PullRequestExists(repoName string, repoOwner st
 	}
 
 	pullRequests := resp.(map[string]interface{})
-	log.Println("Pull Req exists? -> Resp length: ", string(len(pullRequests["values"].([]interface{}))))
+	log.Println("Pull Req exists? -> Resp length: ", fmt.Sprint(len(pullRequests["values"].([]interface{}))))
 
 	log.Println("--------- End PullRequestExists ---------")
 	return len(pullRequests["values"].([]interface{})) > 0, nil

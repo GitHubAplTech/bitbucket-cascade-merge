@@ -30,8 +30,11 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 	var PullRequestPayload PullRequestMergedPayload
 
 	buf, err := ioutil.ReadAll(c.Request.Body)
-	err = json.Unmarshal(buf, &PullRequestPayload)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	err = json.Unmarshal(buf, &PullRequestPayload)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,8 +81,5 @@ func (ctrl *BitbucketController) validate(request *http.Request) bool {
 		log.Println("Url Param 'key' is missing")
 	}
 	key := keys[0]
-	if ctrl.BitbucketSharedKey == key {
-		return true
-	}
-	return false
+	return ctrl.BitbucketSharedKey == key
 }
