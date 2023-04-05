@@ -2,11 +2,13 @@ package main
 
 import (
 	"bitbucket-cascade-merge/internal"
-	"github.com/gin-gonic/gin"
-	"github.com/ktrysmt/go-bitbucket"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ktrysmt/go-bitbucket"
 )
+
 //"google.golang.org/api/apikeys/v2"
 
 func main() {
@@ -47,12 +49,9 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.POST("/", bitbucketController.Webhook)
-	router.GET("/", func(c *gin.Context){
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, nil)
 	})
 
 	_ = router.Run(":" + port)
 }
-
-
-
