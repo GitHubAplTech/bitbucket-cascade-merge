@@ -131,7 +131,11 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 
 	//Try approve (if not UAT)
 	if !strings.HasPrefix(destBranch, "uat") {
-		url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + repoOwner + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
+
+		workspace := os.Getenv("BITBUCKET_WORKSPACE")
+		log.Println("workspace: ", workspace)
+
+		url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + repoOwner + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
 		req, err := http.NewRequest("POST", url, nil)
 		if err != nil {
 			return err
@@ -449,8 +453,13 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
+	workspace := os.Getenv("BITBUCKET_WORKSPACE")
+	log.Println("workspace: ", workspace)
 
-	url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=100"
+	//This worked before switching to syncreon workspace
+	//url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=100"
+
+	url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=100"
 	log.Println(string(url))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

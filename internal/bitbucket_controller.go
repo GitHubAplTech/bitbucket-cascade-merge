@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -51,7 +52,7 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 				log.Println("In Detect a force-retrigger. Comment=", PullRequestPayload.Comment.Content.Raw)
 
 				// Only counts if comment = "#AutoCascade or new Jira editor is `#AutoCascade`"
-				if PullRequestPayload.Comment.Content.Raw == "#AutoCascade" || PullRequestPayload.Comment.Content.Raw == "`#AutoCascade`" {
+				if strings.TrimSpace(PullRequestPayload.Comment.Content.Raw) == "#AutoCascade" || strings.TrimSpace(PullRequestPayload.Comment.Content.Raw) == "`#AutoCascade`" {
 					log.Println("In Set PrForceRetrigger = true")
 					PrForceRetrigger = true
 				}
