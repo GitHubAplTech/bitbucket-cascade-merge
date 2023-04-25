@@ -135,7 +135,7 @@ func (service *BitbucketService) ApprovePullRequest(repoOwner string, repoName s
 		workspace := os.Getenv("BITBUCKET_WORKSPACE")
 		log.Println("workspace: ", workspace)
 
-		url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + "/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
+		url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + repoName + "/pullrequests/" + pullRequestId + "/approve"
 		req, err := http.NewRequest("POST", url, nil)
 		if err != nil {
 			return err
@@ -459,7 +459,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	//This worked before switching to syncreon workspace
 	//url := service.bitbucketClient.GetApiBaseURL() + "/repositories/" + username + "/" + repoSlug + "/refs/branches?pagelen=100"
 
-	url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + "/" + repoSlug + "/refs/branches?pagelen=100"
+	url := service.bitbucketClient.GetApiHostnameURL() + "/" + workspace + "/repositories/" + repoSlug + "/refs/branches?pagelen=100"
 	log.Println(string(url))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
