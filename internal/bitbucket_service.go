@@ -467,7 +467,7 @@ func (service *BitbucketService) GetBranches(repoSlug string, repoOwner string) 
 	}
 
 	//Enable for debugging
-	//log.Println("B4 Targets -> Branches resp body: ", string(body))
+	log.Println("B4 Targets -> Branches resp body: ", string(body))
 
 	var result BranchesPayload
 
