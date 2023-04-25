@@ -50,8 +50,8 @@ func (ctrl *BitbucketController) Webhook(c *gin.Context) {
 			if c.Request.Header.Get("X-Event-Key") == PrCommentTrigger {
 				log.Println("In Detect a force-retrigger. Comment=", PullRequestPayload.Comment.Content.Raw)
 
-				// Only counts if comment = "#AutoCascade"
-				if PullRequestPayload.Comment.Content.Raw == "#AutoCascade" {
+				// Only counts if comment = "#AutoCascade or new Jira editor is `#AutoCascade`"
+				if PullRequestPayload.Comment.Content.Raw == "#AutoCascade" || PullRequestPayload.Comment.Content.Raw == "`#AutoCascade`" {
 					log.Println("In Set PrForceRetrigger = true")
 					PrForceRetrigger = true
 				}
